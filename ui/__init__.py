@@ -45,11 +45,11 @@ class VIEW3D_PT_default_scene(bpy.types.Panel):
         col = layout.column(align=True)
         row = col.row(align=True)
         if not scn.ds_scene_created:
-            row.operator("scene.default_scene_operator", text="Create Default Scene", icon="IMPORT").action = "CREATE"
+            row.operator("scene.create_default_scene", text="Create Default Scene", icon="IMPORT").action = "CREATE"
         else:
-            row.operator("scene.default_scene_operator", text="Update Default Scene", icon="FILE_REFRESH").action = "UPDATE"
+            row.operator("scene.create_default_scene", text="Update Default Scene", icon="FILE_REFRESH").action = "UPDATE"
             row = col.row(align=True)
-            row.operator("scene.default_scene_operator", text="Delete Default Scene", icon="CANCEL").action = "DELETE"
+            row.operator("scene.create_default_scene", text="Delete Default Scene", icon="CANCEL").action = "DELETE"
 
         col = layout.column(align=True)
         row = col.row(align=True)
