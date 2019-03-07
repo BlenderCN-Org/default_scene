@@ -43,7 +43,6 @@ class SCENE_OT_create_default_scene(bpy.types.Operator):
     @classmethod
     def poll(self, context):
         """ ensures operator can execute (if not, returns false) """
-        scn = bpy.context.scene
         return bpy.context.active_object is not None
 
     def execute(self, context):
