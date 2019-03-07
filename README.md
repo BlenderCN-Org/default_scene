@@ -1,4 +1,3 @@
-# materials_add_on
+# Default Scene Generator
 
-  * Future improvements:
-      * ...
+Automatically generate a camera, lights, and world settings tuned for photorealistic Bricker renders

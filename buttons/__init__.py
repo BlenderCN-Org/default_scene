@@ -60,7 +60,7 @@ class SCENE_OT_create_default_scene(bpy.types.Operator):
         l1, l2, l3 = self.addLightObjects(parent2)
         self.cam_ob = self.addCameraObject(parent1) if scn.ds_include_camera else None
 
-        cm = None if not isBrickerInstalled() or scn.cmlist_index > -1 else scn.cmlist[scn.cmlist_index]
+        cm = None if not isBrickerInstalled() or scn.cmlist_index == -1 else scn.cmlist[scn.cmlist_index]
         if cm is None:
             parent1.location = self.orig_active_obj.location
             self.cam_ob.data.dof_object = self.orig_active_obj
