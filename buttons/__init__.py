@@ -30,10 +30,10 @@ from mathutils import Vector
 # Addon imports
 from ..functions import *
 
-class defaultScene(bpy.types.Operator):
-    """create/delete scene with custom default lighting and world settings"""      # blender will ue this as a tooltip for menu items and buttons.
-    bl_idname = "scene.default_scene_operator"                                  # unique identifier for buttons and menu items to reference.
-    bl_label = "Default Scene Operator"                                         # display name in the interface.
+class SCENE_OT_create_default_scene(bpy.types.Operator):
+    """create (or update/delete) scene with custom default lighting and world settings"""
+    bl_idname = "scene.create_default_scene"
+    bl_label = "Create Default Scene"
     bl_options = {"REGISTER", "UNDO"}
 
 
@@ -114,7 +114,8 @@ class defaultScene(bpy.types.Operator):
             ("CREATE", "Create", ""),
             ("UPDATE", "Update", ""),
             ("DELETE", "Delete", ""),
-        )
+        ),
+        default="CREATE"
     )
 
     #############################################

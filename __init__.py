@@ -45,7 +45,8 @@ def updateScale(self, context):
         parent.scale = (scn.ds_scale, scn.ds_scale, scn.ds_scale)
 
 def register():
-    bpy.utils.register_module(__name__)
+    bpy.utils.register_class(VIEW3D_PT_default_scene)
+    bpy.utils.register_class(SCENE_OT_create_default_scene)
 
     bpy.types.Scene.ds_scale = FloatProperty(
         name="Scene Scale",
@@ -66,7 +67,8 @@ def unregister():
     del Scn.ds_include_camera
     del Scn.ds_scene_created
 
-    bpy.utils.unregister_module(__name__)
+    bpy.utils.unregister_class(SCENE_OT_create_default_scene)
+    bpy.utils.unregister_class(VIEW3D_PT_default_scene)
 
 
 if __name__ == "__main__":
