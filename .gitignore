@@ -1,0 +1,5 @@
+.DS_Store
+__pycache__/
+error_log/
+default_scene_updater/
+default_scene_options.db
