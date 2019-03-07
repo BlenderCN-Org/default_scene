@@ -43,8 +43,7 @@ class SCENE_OT_create_default_scene(bpy.types.Operator):
     @classmethod
     def poll(self, context):
         """ ensures operator can execute (if not, returns false) """
-        scn = bpy.context.scene
-        return scn.objects.active is not None
+        return bpy.context.active_object is not None
 
     def execute(self, context):
         scn = context.scene
@@ -109,7 +108,7 @@ class SCENE_OT_create_default_scene(bpy.types.Operator):
     # class variables
 
     # properties
-    action = bpy.props.EnumProperty(
+    action: bpy.props.EnumProperty(
         items=(
             ("CREATE", "Create", ""),
             ("UPDATE", "Update", ""),
@@ -185,7 +184,7 @@ class SCENE_OT_create_default_scene(bpy.types.Operator):
 
         cam = bpy.data.cameras.new("Default_Scene_camera")
         cam_ob = bpy.data.objects.new("Default_Scene_camera_object", cam)
-        scn.objects.link(cam_ob)
+        scn.collection.objects.link(cam_ob)
         cam_ob.location = (1.2, -4, 1.4)
         cam_ob.rotation_euler = (1.2708, 0, 0.3)
 
@@ -201,8 +200,8 @@ class SCENE_OT_create_default_scene(bpy.types.Operator):
         scn = bpy.context.scene
 
         # add area lamp 1
-        bpy.ops.object.lamp_add(type='AREA', radius=1, view_align=False, location=(0, 0, 0), layers=(True, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False))
-        emit1 = scn.objects.active
+        bpy.ops.object.light_add(type='AREA', radius=1, view_align=False, location=(0, 0, 0))
+        emit1 = bpy.context.active_object
         emit1.name = "Default_Scene_emitter_1"
         nodes = emit1.data.node_tree.nodes
         bb = nodes.new('ShaderNodeBlackbody')
@@ -211,8 +210,8 @@ class SCENE_OT_create_default_scene(bpy.types.Operator):
         lf.inputs[0].default_value = 175
 
         # add area lamp 2
-        bpy.ops.object.lamp_add(type='AREA', radius=1, view_align=False, location=(0, 0, 0), layers=(True, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False))
-        emit2 = scn.objects.active
+        bpy.ops.object.light_add(type='AREA', radius=1, view_align=False, location=(0, 0, 0))
+        emit2 = bpy.context.active_object
         emit2.name = "Default_Scene_emitter_2"
         nodes = emit2.data.node_tree.nodes
         bb = nodes.new('ShaderNodeBlackbody')
@@ -221,8 +220,8 @@ class SCENE_OT_create_default_scene(bpy.types.Operator):
         lf.inputs[0].default_value = 160
 
         # add area lamp 3
-        bpy.ops.object.lamp_add(type='AREA', radius=1, view_align=False, location=(0, 0, 0), layers=(True, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False))
-        emit3 = scn.objects.active
+        bpy.ops.object.light_add(type='AREA', radius=1, view_align=False, location=(0, 0, 0))
+        emit3 = bpy.context.active_object
         emit3.name = "Default_Scene_emitter_3"
         nodes = emit3.data.node_tree.nodes
         nodes["Emission"].inputs[0].default_value = (1, 1, 1, 1)

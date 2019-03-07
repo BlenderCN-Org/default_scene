@@ -19,6 +19,7 @@
 import random
 import sys
 import time
+import math
 import os
 import platform
 import itertools
@@ -27,13 +28,14 @@ import json
 import traceback
 import subprocess
 import hashlib
+import numpy as np
 from math import *
 
 # Blender imports
 import bpy
 import bmesh
 from mathutils import Vector, Euler, Matrix
-from bpy.types import Object, Scene
+from bpy.types import Object, Scene, ViewLayer
 props = bpy.props
 
 # https://github.com/CGCookie/retopoflow
@@ -64,9 +66,9 @@ def stopwatch(text:str, lastTime, precision:int=5):
     return time.time()
 
 
-def groupExists(name:str):
-    """ check if group exists in blender's memory """
-    return name in bpy.data.groups.keys()
+def collExists(name:str):
+    """ check if collection exists in blender's memory """
+    return name in bpy.data.collections.keys()
 
 
 def getItemByID(collection:bpy.types.CollectionProperty, id:int):
@@ -91,7 +93,7 @@ def str_to_bool(s:str):
 def get_settings():
     """ get preferences for current addon """
     if not hasattr(get_settings, 'settings'):
-        addons = bpy.context.user_preferences.addons
+        addons = bpy.context.preferences.addons
         folderpath = os.path.dirname(os.path.abspath(__file__))
         while folderpath:
             folderpath,foldername = os.path.split(folderpath)
@@ -156,11 +158,20 @@ def tag_redraw_areas(areaTypes:iter=["ALL"]):
                 area.tag_redraw()
 
 
+def tag_redraw_viewport_in_all_screens():
+    """redraw the 3D viewport in all screens (bypasses bpy.context.screen)"""
+    for screen in bpy.data.screens:
+        for area in screen.areas:
+            if area.type == "VIEW_3D":
+                area.tag_redraw()
+
+
+
 def disableRelationshipLines():
     """ disable relationship lines in VIEW_3D """
     for area in bpy.context.screen.areas:
         if area.type == 'VIEW_3D':
-            area.spaces[0].show_relationship_lines = False
+            area.spaces[0].overlay.show_relationship_lines = False
 
 
 def drawBMesh(bm:bmesh, name:str="drawnBMesh"):
@@ -170,9 +181,8 @@ def drawBMesh(bm:bmesh, name:str="drawnBMesh"):
     obj = bpy.data.objects.new(name, m)
 
     scn = bpy.context.scene   # grab a reference to the scene
-    scn.objects.link(obj)     # link new object to scene
-    scn.objects.active = obj  # make new object active
-    obj.select = True         # make new object selected (does not deselect other objects)
+    scn.collection.objects.link(obj)     # link new object to scene
+    select(obj, active=True)  # select new object and make active (does not deselect other objects)
     bm.to_mesh(m)             # push bmesh data into m
     return obj
 
@@ -368,36 +378,49 @@ def openLayer(layerNum:int, scn:Scene=None):
 
 
 def deselectAll():
-    for obj in bpy.context.selected_objects:
-        if obj.select:
-            obj.select = False
+    try:
+        selected_objects = bpy.context.selected_objects
+    except AttributeError:
+        selected_objects = [obj for obj in bpy.context.view_layer.objects if obj.select_get()]
+    deselect(selected_objects)
 
 
 def selectAll(hidden:bool=False):
     for obj in bpy.context.scene.objects:
-        if not obj.select and (not obj.hide or hidden):
-            obj.select = True
+        if not obj.select_get() and (not obj.hide_viewport or hidden):
+            obj.select_set(True)
 
 
 def hide(objs):
     objs = confirmIter(objs)
     for obj in objs:
-        obj.hide = True
+        obj.hide_viewport = True
 
 
 def unhide(objs):
     objs = confirmIter(objs)
     for obj in objs:
-        if obj.hide:
-            obj.hide = False
+        if obj.hide_viewport:
+            obj.hide_viewport = False
 
 
-def setActiveObj(obj:Object, scene:Scene=None):
+def setActiveObj(obj:Object, view_layer:ViewLayer=None):
     if obj is None:
         return
     assert type(obj) == Object
-    scene = scene or bpy.context.scene
-    scene.objects.active = obj
+    view_layer = view_layer or bpy.context.view_layer
+    view_layer.objects.active = obj
+
+
+def isObjVisibleInViewport(obj):
+    if obj is None: return False
+    objVisible = not obj.hide_viewport
+    if objVisible:
+        for cn in obj.users_collection:
+            if cn.hide_viewport:
+                objVisible = False
+                break
+    return objVisible
 
 
 def select(objList, active:bool=False, only:bool=False):
@@ -408,10 +431,22 @@ def select(objList, active:bool=False, only:bool=False):
     if only: deselectAll()
     # select/deselect objects in list
     for obj in objList:
-        if obj is not None and not obj.select:
-            obj.select = True
+        if obj is not None and not obj.select_get():
+            obj.select_set(True)
     # set active object
     if active: setActiveObj(objList[0])
+
+
+def selectVerts(vertList, only:bool=False):
+    """ selects verts in list and deselects the rest """
+    # confirm vertList is a list of vertices
+    vertList = confirmList(vertList)
+    # deselect all if selection is exclusive
+    if only: deselectAll()
+    # select/deselect vertices in list
+    for v in vertList:
+        if v is not None and not v.select:
+            v.select = True
 
 
 def deselect(objList):
@@ -420,17 +455,19 @@ def deselect(objList):
     objList = confirmList(objList)
     # select/deselect objects in list
     for obj in objList:
-        if obj is not None and obj.select:
-            obj.select = False
+        if obj is not None and obj.select_get():
+            obj.select_set(False)
 
 
-def delete(objs):
+def delete(objs, remove_meshes=False):
     """ efficient deletion of objects """
     objs = confirmIter(objs)
     for obj in objs:
         if obj is None:
             continue
+        if remove_meshes: m = obj.data
         bpy.data.objects.remove(obj, do_unlink=True)
+        if remove_meshes and m is not None: bpy.data.meshes.remove(m)
 
 
 def duplicate(obj:Object, linked:bool=False, link_to_scene:bool=False):
@@ -438,9 +475,9 @@ def duplicate(obj:Object, linked:bool=False, link_to_scene:bool=False):
     copy = obj.copy()
     if not linked and copy.data:
         copy.data = copy.data.copy()
-    copy.hide = False
+    copy.hide_viewport = False
     if link_to_scene:
-        bpy.context.scene.objects.link(copy)
+        bpy.context.scene.collection.objects.link(copy)
     return copy
 
 
@@ -625,7 +662,7 @@ def apply_transform(obj:Object, location:bool=True, rotation:bool=True, scale:bo
     s_mat_x = Matrix.Scale(scale.x, 4, Vector((1, 0, 0)))
     s_mat_y = Matrix.Scale(scale.y, 4, Vector((0, 1, 0)))
     s_mat_z = Matrix.Scale(scale.z, 4, Vector((0, 0, 1)))
-    if scale:    m.transform(s_mat_x * s_mat_y * s_mat_z)
+    if scale:    m.transform(s_mat_x @ s_mat_y @ s_mat_z)
     else:        obj.scale = scale
     if rotation: m.transform(rot.to_matrix().to_4x4())
     else:        obj.rotation_euler = rot.to_euler()
@@ -698,16 +735,22 @@ def apply_modifiers(obj, settings="PREVIEW"):
 def safeUnlink(obj, protect=True):
     scn = bpy.context.scene
     try:
-        scn.objects.unlink(obj)
+        for coll in obj.users_collection:
+            coll.objects.unlink(obj)
     except RuntimeError:
         pass
     obj.protected = protect
     obj.use_fake_user = True
 
 
-def safeLink(obj, protect=False):
+def safeLink(obj, protect=False, collections=None):
     scn = bpy.context.scene
-    scn.objects.link(obj)
+    collections = collections or [scn.collection]
+    for coll in collections:
+        try:
+            coll.objects.link(obj)
+        except RuntimeError:
+            continue
     obj.protected = protect
     obj.use_fake_user = False
 
@@ -779,7 +822,7 @@ def bounds(obj, local:bool=False, use_adaptive_domain:bool=True):
     om = obj.matrix_world
 
     if not local:
-        worldify = lambda p: om * Vector(p[:])
+        worldify = lambda p: om @ Vector(p[:])
         coords = [worldify(p).to_tuple() for p in local_coords]
     else:
         coords = [p[:] for p in local_coords]
@@ -827,9 +870,9 @@ def setObjOrigin(obj, loc):
     s_mat_x = Matrix.Scale(s.x, 4, Vector((1, 0, 0)))
     s_mat_y = Matrix.Scale(s.y, 4, Vector((0, 1, 0)))
     s_mat_z = Matrix.Scale(s.z, 4, Vector((0, 0, 1)))
-    s_mat = s_mat_x * s_mat_y * s_mat_z
+    s_mat = s_mat_x @ s_mat_y @ s_mat_z
     m = obj.data
-    m.transform(Matrix.Translation((obj.location-loc) * l_mat * r_mat * s_mat.inverted()))
+    m.transform(Matrix.Translation((obj.location-loc) @ l_mat @ r_mat @ s_mat.inverted()))
     obj.location = loc
 
 

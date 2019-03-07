@@ -2,7 +2,7 @@ bl_info = {
     "name"        : "Default Scene",
     "author"      : "Christopher Gearhart <chris@bblanimation.com>",
     "version"     : (0, 1, 0),
-    "blender"     : (2, 78, 0),
+    "blender"     : (2, 80, 0),
     "description" : "Create quick default scene for quick and easy scene setup/rendering",
     "location"    : "VIEW_3D > Tools > Bricker > Default Scene",
     "warning"     : "Work in progress",
