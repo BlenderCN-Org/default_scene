@@ -15,7 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .common import *
-from .general import *
-from .mesh_generate import *
-from .useractions import *
+from .blender import *
+from .colors import *
+from .maths import *
+from .paths import *
+from .python_utils import *
+from .reporting import *
+from .transform import *
+from .wrappers import *

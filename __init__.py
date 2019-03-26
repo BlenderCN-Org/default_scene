@@ -1,8 +1,25 @@
+# Copyright (C) 2019 Christopher Gearhart
+# chris@bblanimation.com
+# http://bblanimation.com/
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 bl_info = {
     "name"        : "Default Scene",
     "author"      : "Christopher Gearhart <chris@bblanimation.com>",
     "version"     : (0, 1, 0),
-    "blender"     : (2, 78, 0),
+    "blender"     : (2, 79, 0),
     "description" : "Create quick default scene for quick and easy scene setup/rendering",
     "location"    : "VIEW_3D > Tools > Bricker > Default Scene",
     "warning"     : "Work in progress",
@@ -10,33 +27,17 @@ bl_info = {
     "tracker_url" : "",
     "category"    : "World"}
 
-"""
-Copyright (C) 2017 Bricks Brought to Life
-http://bblanimation.com/
-chris@bblanimation.com
+# System imports
+# NONE!
 
-Created by Christopher Gearhart
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-"""
-
-# system imports
+# Blender imports
 import bpy
 from bpy.props import *
+props = bpy.props
+
+# Addon imports
 from .ui import *
 from .buttons import *
-props = bpy.props
 
 def updateScale(self, context):
     scn = context.scene

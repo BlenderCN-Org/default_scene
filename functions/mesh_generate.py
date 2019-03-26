@@ -1,6 +1,26 @@
+# Copyright (C) 2019 Christopher Gearhart
+# chris@bblanimation.com
+# http://bblanimation.com/
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# System imports
+import math
+
+# Blender imports
 import bpy
 import bmesh
-import math
 
 def makeSquare():
     # create new bmesh object
@@ -334,7 +354,7 @@ def makeLattice(R, s, o=(0,0,0)):
                     e = bme.edges.new((vertMatrix[x][y][z], vertMatrix[x-1][y][z]))
     # return bmesh
     return bme
-# 
+#
 # def newObjFromBmesh(layer, bme, meshName, objName=False):
 #
 #     # if only one name given, use it for both names
