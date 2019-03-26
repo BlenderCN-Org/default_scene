@@ -19,7 +19,7 @@ bl_info = {
     "name"        : "Default Scene",
     "author"      : "Christopher Gearhart <chris@bblanimation.com>",
     "version"     : (0, 1, 0),
-    "blender"     : (2, 79, 0),
+    "blender"     : (2, 80, 0),
     "description" : "Create quick default scene for quick and easy scene setup/rendering",
     "location"    : "VIEW_3D > Tools > Bricker > Default Scene",
     "warning"     : "Work in progress",
@@ -33,11 +33,18 @@ bl_info = {
 # Blender imports
 import bpy
 from bpy.props import *
+from bpy.utils import register_class, unregister_class
 props = bpy.props
 
 # Addon imports
 from .ui import *
 from .buttons import *
+from .functions.common import *
+
+classes = (
+    VIEW3D_PT_default_scene,
+    SCENE_OT_create_default_scene,
+)
 
 def updateScale(self, context):
     scn = context.scene
@@ -46,8 +53,9 @@ def updateScale(self, context):
         parent.scale = (scn.ds_scale, scn.ds_scale, scn.ds_scale)
 
 def register():
-    bpy.utils.register_class(VIEW3D_PT_default_scene)
-    bpy.utils.register_class(SCENE_OT_create_default_scene)
+    for cls in classes:
+        make_annotations(cls)
+        register_class(cls)
 
     bpy.types.Scene.ds_scale = FloatProperty(
         name="Scene Scale",
@@ -68,8 +76,8 @@ def unregister():
     del Scn.ds_include_camera
     del Scn.ds_scene_created
 
-    bpy.utils.unregister_class(SCENE_OT_create_default_scene)
-    bpy.utils.unregister_class(VIEW3D_PT_default_scene)
+    for cls in reversed(classes):
+        unregister_class(cls)
 
 
 if __name__ == "__main__":

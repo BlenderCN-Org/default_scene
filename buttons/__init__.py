@@ -180,7 +180,7 @@ class SCENE_OT_create_default_scene(bpy.types.Operator):
 
         cam = bpy.data.cameras.new("Default_Scene_camera")
         cam_ob = bpy.data.objects.new("Default_Scene_camera_object", cam)
-        scn.objects.link(cam_ob)
+        link_object(cam_ob)
         cam_ob.location = (1.2, -4, 1.4)
         cam_ob.rotation_euler = (1.2708, 0, 0.3)
 
@@ -196,7 +196,7 @@ class SCENE_OT_create_default_scene(bpy.types.Operator):
         scn = bpy.context.scene
 
         # add area lamp 1
-        bpy.ops.object.lamp_add(type='AREA', radius=1, view_align=False, location=(0, 0, 0))
+        light_add(type='AREA')
         emit1 = bpy.context.active_object
         emit1.name = "Default_Scene_emitter_1"
         nodes = emit1.data.node_tree.nodes
@@ -206,7 +206,7 @@ class SCENE_OT_create_default_scene(bpy.types.Operator):
         lf.inputs[0].default_value = 175
 
         # add area lamp 2
-        bpy.ops.object.lamp_add(type='AREA', radius=1, view_align=False, location=(0, 0, 0))
+        light_add(type='AREA')
         emit2 = bpy.context.active_object
         emit2.name = "Default_Scene_emitter_2"
         nodes = emit2.data.node_tree.nodes
@@ -216,7 +216,7 @@ class SCENE_OT_create_default_scene(bpy.types.Operator):
         lf.inputs[0].default_value = 160
 
         # add area lamp 3
-        bpy.ops.object.lamp_add(type='AREA', radius=1, view_align=False, location=(0, 0, 0))
+        light_add(type='AREA')
         emit3 = bpy.context.active_object
         emit3.name = "Default_Scene_emitter_3"
         nodes = emit3.data.node_tree.nodes

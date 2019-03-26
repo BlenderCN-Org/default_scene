@@ -18,11 +18,12 @@
 # Blender imports
 import bpy
 from bpy.props import *
+from ..functions.common import *
 
 
 class VIEW3D_PT_default_scene(bpy.types.Panel):
     bl_space_type  = "VIEW_3D"
-    bl_region_type = "TOOLS"
+    bl_region_type = "UI" if b280() else "TOOLS"
     bl_category    = "Bricker"
     bl_label       = "Default Scene"
     bl_idname      = "VIEW3D_PT_Tools_Bricker_Default_Scene"
