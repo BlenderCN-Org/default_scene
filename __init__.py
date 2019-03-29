@@ -21,7 +21,7 @@ bl_info = {
     "version"     : (0, 1, 0),
     "blender"     : (2, 80, 0),
     "description" : "Create quick default scene for quick and easy scene setup/rendering",
-    "location"    : "VIEW_3D > Tools > Bricker > Default Scene",
+    "location"    : "Properties > Scene > Default Scene",
     "warning"     : "Work in progress",
     "wiki_url"    : "",
     "tracker_url" : "",
@@ -42,7 +42,7 @@ from .buttons import *
 from .functions.common import *
 
 classes = (
-    VIEW3D_PT_default_scene,
+    SCENE_PT_default_scene,
     SCENE_OT_create_default_scene,
 )
 

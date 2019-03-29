@@ -161,7 +161,7 @@ class Actions:
         self.space = context.space_data
         self.region = context.region
         self.size = (context.region.width,context.region.height)
-        self.r3d = context.space_data.region_3d
+        # self.r3d = context.space_data.region_3d
 
         self.actions_using = set()
         self.actions_pressed = set()
@@ -204,7 +204,7 @@ class Actions:
         if context.region and hasattr(context.space_data, 'region_3d'):
             self.region = context.region
             self.size = (context.region.width,context.region.height)
-            self.r3d = context.space_data.region_3d
+            # self.r3d = context.space_data.region_3d
 
         # # handle strange edge cases
         # if not context.area:

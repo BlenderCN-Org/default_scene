@@ -32,7 +32,6 @@ class SCENE_OT_create_default_scene(bpy.types.Operator):
     bl_label = "Create Default Scene"
     bl_options = {"REGISTER", "UNDO"}
 
-
     ################################################
     # Blender Operator methods
 
@@ -48,8 +47,6 @@ class SCENE_OT_create_default_scene(bpy.types.Operator):
             scn.ds_scene_created = False
             if self.action == "DELETE":
                 return{"FINISHED"}
-
-        scn.render.engine = 'CYCLES'
 
         parent1, parent2 = self.addParentObj()
         self.setWorldValues()

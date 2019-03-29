@@ -18,22 +18,24 @@
 # Blender imports
 import bpy
 from bpy.props import *
+from bpy.types import Panel
+
+# Addon imports
 from ..functions.common import *
 
 
-class VIEW3D_PT_default_scene(bpy.types.Panel):
-    bl_space_type  = "VIEW_3D"
-    bl_region_type = "UI" if b280() else "TOOLS"
-    bl_category    = "Bricker"
+class SCENE_PT_default_scene(Panel):
+    bl_space_type  = "PROPERTIES"
+    bl_region_type = "WINDOW"
+    bl_context     = "scene"
     bl_label       = "Default Scene"
-    bl_idname      = "VIEW3D_PT_Tools_Bricker_Default_Scene"
-    bl_context     = "objectmode"
+    bl_idname      = "SCENE_PT_default_scene"
     COMPAT_ENGINES = {"CYCLES"}
 
-    # @classmethod
-    # def poll(cls, context):
-    #     """ Only renders UI if cycles render engine is used """
-    #     return bpy.context.scene.render.engine == 'CYCLES'
+    @classmethod
+    def poll(cls, context):
+        """ Only renders UI if cycles render engine is used """
+        return (context.engine in cls.COMPAT_ENGINES)
 
     def draw(self, context):
         layout = self.layout
