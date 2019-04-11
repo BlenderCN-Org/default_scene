@@ -30,12 +30,12 @@ class SCENE_PT_default_scene(Panel):
     bl_context     = "scene"
     bl_label       = "Default Scene"
     bl_idname      = "SCENE_PT_default_scene"
-    COMPAT_ENGINES = {"CYCLES"}
+    COMPAT_ENGINES = {"CYCLES", "BLENDER_EEVEE"}
 
-    @classmethod
-    def poll(cls, context):
-        """ Only renders UI if cycles render engine is used """
-        return (context.engine in cls.COMPAT_ENGINES)
+    # @classmethod
+    # def poll(cls, context):
+    #     """ Only renders UI if cycles render engine is used """
+    #     return (context.engine in cls.COMPAT_ENGINES)
 
     def draw(self, context):
         layout = self.layout
@@ -43,12 +43,17 @@ class SCENE_PT_default_scene(Panel):
 
         col = layout.column(align=True)
         row = col.row(align=True)
+
+        if context.engine not in self.COMPAT_ENGINES:
+            row.label(text="Please switch to the 'CYCLES' or 'EEVEE' render engine")
+            return
+
         if not scn.ds_scene_created:
-            row.operator("scene.create_default_scene", text="Create Default Scene", icon="IMPORT").action = "CREATE"
+            row.operator("scene.setup_default_scene", icon="IMPORT")
         else:
-            row.operator("scene.create_default_scene", text="Update Default Scene", icon="FILE_REFRESH").action = "UPDATE"
+            row.operator("scene.position_default_camera", icon="CAMERA_DATA")
             row = col.row(align=True)
-            row.operator("scene.create_default_scene", text="Delete Default Scene", icon="CANCEL").action = "DELETE"
+            row.operator("scene.delete_default_scene", icon="CANCEL")
 
         col = layout.column(align=True)
         row = col.row(align=True)

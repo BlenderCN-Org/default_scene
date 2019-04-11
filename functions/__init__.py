@@ -18,4 +18,5 @@
 from .common import *
 from .general import *
 from .mesh_generate import *
+from .prop_update_utils import *
 from .useractions import *

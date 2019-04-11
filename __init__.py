@@ -40,17 +40,16 @@ props = bpy.props
 from .ui import *
 from .buttons import *
 from .functions.common import *
+from .functions.prop_update_utils import *
 
 classes = (
     SCENE_PT_default_scene,
-    SCENE_OT_create_default_scene,
+    SCENE_OT_setup_default_scene,
+    SCENE_OT_delete_default_scene,
+    SCENE_OT_position_default_camera,
 )
 
-def updateScale(self, context):
-    scn = context.scene
-    parent = bpy.data.objects.get('Default_Scene_parent_1')
-    if parent:
-        parent.scale = (scn.ds_scale, scn.ds_scale, scn.ds_scale)
+
 
 def register():
     for cls in classes:
@@ -66,6 +65,7 @@ def register():
     bpy.types.Scene.ds_include_camera = BoolProperty(
         name="Include Camera",
         description="Add camera to scene in addition to adding lights and world data",
+        update=updateCamera,
         default=True)
     bpy.types.Scene.ds_scene_created = BoolProperty(default=False)
 

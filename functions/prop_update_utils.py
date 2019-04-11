@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Christopher Gearhart
+# Copyright (C) 2018 Christopher Gearhart
 # chris@bblanimation.com
 # http://bblanimation.com/
 #
@@ -15,6 +15,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .setup_default_scene import *
-from .delete_default_scene import *
-from .position_default_camera import *
+# Blender imports
+import bpy
+
+
+def updateScale(self, context):
+    scn = context.scene
+    parent = bpy.data.objects.get('Default_Scene_parent_1')
+    if parent:
+        parent.scale = (scn.ds_scale, scn.ds_scale, scn.ds_scale)
+
+
+def updateCamera(self, context):
+    scn = context.scene
+    if scn.ds_include_camera:
+        enableDefaultCamera()
+    else:
+        cam_ob = bpy.data.objects.get("Default_Scene_camera_object")
+        if cam_ob is not None: unlink_object(cam_ob)

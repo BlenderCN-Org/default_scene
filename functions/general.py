@@ -26,3 +26,11 @@ def setLockCameraToView(value:bool=True):
     for area in bpy.context.screen.areas:
         if area.type == 'VIEW_3D':
             area.spaces[0].lock_camera = value
+
+
+def enableDefaultCamera():
+    cam_ob = bpy.data.objects.get("Default_Scene_camera_object")
+    if cam_ob is not None:
+        link_object(cam_ob)
+        select(cam_ob, active=cam_ob)
+        scn.camera = cam_ob
