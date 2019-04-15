@@ -45,6 +45,7 @@ class SCENE_OT_delete_default_scene(bpy.types.Operator):
         scn = context.scene
         self.removeObjects()
         scn.ds_scene_created = False
+        return {"FINISHED"}
 
     #############################################
     # class methods

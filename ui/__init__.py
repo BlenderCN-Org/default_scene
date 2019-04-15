@@ -78,3 +78,9 @@ class SCENE_PT_default_scene(Panel):
                 row.column().prop(parent2, "rotation_axis_angle", text="Lighting Rotation")
             else:
                 row.column().prop(parent2, "rotation_euler", text="Lighting Rotation")
+
+        col = layout.column(align=True)
+        row = col.row(align=True)
+        row.label(text="HDRI Resolution:")
+        row = col.row(align=True)
+        row.column().prop(scn, "hdri_resolution", text="")

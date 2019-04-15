@@ -54,7 +54,7 @@ class SCENE_OT_position_default_camera(bpy.types.Operator):
         if event.type == "ESC":
             return self.end_cancel()
         self.actions.update(context, event, print_actions=False)
-        return {"PASS_THROUGH"} if self.actions.navigating() else {"RUNNING_MODAL"}
+        return {"PASS_THROUGH"} if self.actions.navigating() or event.type == "RIGHTMOUSE" else {"RUNNING_MODAL"}
 
     ###################################################
     # initialization method
@@ -71,11 +71,16 @@ class SCENE_OT_position_default_camera(bpy.types.Operator):
         bpy.context.window.cursor_set("SCROLL_XY")
         self.viewCamera()
         setLockCameraToView(True)
+        parent_clear(self.cam_ob)
 
     def end(self):
         bpy.context.window.cursor_set("DEFAULT")
         setLockCameraToView(False)
-        self.viewLast()
+        # self.viewLast()
+        p1 = bpy.data.objects.get("Default_Scene_parent_1")
+        if p1 is not None:
+            self.cam_ob.parent = p1
+            self.cam_ob.matrix_parent_inverse = p1.matrix_world.inverted()
 
     def end_commit(self):
         self.end()

@@ -45,6 +45,7 @@ class SCENE_OT_setup_default_scene(bpy.types.Operator):
         scn = context.scene
 
         parent1, parent2 = self.addParentObj()
+
         self.setWorldValues()
         l1, l2, l3 = self.addLightObjects(parent2)
         self.cam_ob = self.addCameraObject(parent1, include=scn.ds_include_camera)
@@ -79,8 +80,7 @@ class SCENE_OT_setup_default_scene(bpy.types.Operator):
         scn.world.light_settings.use_ambient_occlusion = False
 
         #select world node tree
-        wd = scn.world
-        nt = bpy.data.worlds[wd.name].node_tree
+        nt = scn.world.node_tree
 
         #create new environment texture node if it doesn't already exist
         envTexNode = nt.nodes.get("Default World Texture")
@@ -99,27 +99,36 @@ class SCENE_OT_setup_default_scene(bpy.types.Operator):
                     backConnected = True
         if backNode is None:
             backNode = nt.nodes.new('ShaderNodeBackground')
-            backNode.location.x = worldOutNode.location.x - 300
-            backNode.location.y = worldOutNode.location.y
+            backNode.location = worldOutNode.location
         if not backConnected:
             backBackOut = backNode.outputs['Background']
             worldSurfIn = worldOutNode.inputs['Surface']
             nt.links.new(backBackOut, worldSurfIn)
         # position envTexNode to left of background node
-        envTexNode.location.x = backNode.location.x - 300
-        envTexNode.location.y = backNode.location.y
+        envTexNode.location = backNode.location - Vector((300, 0))
 
-        #Connect color out of envTexNode to Color in of background node
+        # connect color out of envTexNode to Color in of background node
         envTexColOut = envTexNode.outputs['Color']
         backColIn = backNode.inputs['Color']
         nt.links.new(envTexColOut, backColIn)
 
-        #set backNode strength value
+        # add texture mapping nodes
+        texNode = nt.nodes.get('Texture Coordinate')
+        if texNode is None:
+            texNode = nt.nodes.new('ShaderNodeTexCoord')
+        texNode.location = envTexNode.location - Vector((650, 0))
+        mapNode = nt.nodes.get('Mapping')
+        if mapNode is None:
+            mapNode = nt.nodes.new('ShaderNodeMapping')
+        mapNode.location = texNode.location + Vector((250, 0))
+        nt.links.new(texNode.outputs[0], mapNode.inputs[0])
+        nt.links.new(mapNode.outputs[0], envTexNode.inputs[0])
+
+
+        # set backNode strength value
         backNode.inputs["Strength"].default_value = 0.9
-        #set backNode image value
-        addonPath = os.path.dirname(os.path.abspath(__file__))[:-8] + "/textures"
-        bpy.ops.image.open(filepath="//textures/studio015.hdr", directory=addonPath, files=[{"name":"studio015.hdr", "name":"studio015.hdr"}], show_multiview=False)
-        envTexNode.image = bpy.data.images["studio015.hdr"]
+        # set backNode image value
+        loadHDRI(self, bpy.context)
 
     def addParentObj(self):
         scn = bpy.context.scene
@@ -180,7 +189,6 @@ class SCENE_OT_setup_default_scene(bpy.types.Operator):
         # EEVEE
         emit1.data.color = emit1_color[:3]
         emit1.data.energy = emit1_energy
-        emit1.data.use_shadow = False
 
 
         # add area lamp 2
@@ -199,7 +207,6 @@ class SCENE_OT_setup_default_scene(bpy.types.Operator):
         # EEVEE
         emit2.data.color = emit2_color[:3]
         emit2.data.energy = emit2_energy
-        emit2.data.use_shadow = False
 
         # add area lamp 3
         light_add(type='AREA')
@@ -217,7 +224,6 @@ class SCENE_OT_setup_default_scene(bpy.types.Operator):
         # EEVEE
         emit3.data.color = emit3_color[:3]
         emit3.data.energy = emit3_energy
-        emit3.data.use_shadow = False
 
         emit1.location = (2.5, 0, 1.2)
         emit1.rotation_euler = (radians(70), radians(-12), radians(90))

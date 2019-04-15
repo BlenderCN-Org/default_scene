@@ -15,8 +15,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+# System imports
+import os
+
 # Blender imports
 import bpy
+
+# Addon imports
+from .common import *
 
 
 def updateScale(self, context):
@@ -33,3 +39,24 @@ def updateCamera(self, context):
     else:
         cam_ob = bpy.data.objects.get("Default_Scene_camera_object")
         if cam_ob is not None: unlink_object(cam_ob)
+
+
+def loadHDRI(self, context):
+    # get environment texture node
+    scn = context.scene
+    nt = scn.world.node_tree
+    envTexNode = nt.nodes.get("Default World Texture")
+    if envTexNode is None:
+        return
+
+    # open image
+    # addonPath = os.path.join(get_addon_directory(), "textures")
+    # bpy.ops.image.open(filepath="//textures/studio_small_01_4k.hdr", directory=addonPath, files=[{"name":"studio_small_01_4k.hdr"}], show_multiview=False)
+    # envTexNode.image = bpy.data.images["studio_small_01_4k.hdr"]
+    name = "studio_small_01_{res}.hdr".format(res=scn.hdri_resolution)
+    im_path = os.path.join(get_addon_directory(), "textures", name)
+    im = bpy.data.images.get(name)
+    if im is None:
+        bpy.ops.image.open(filepath=im_path)
+        im = bpy.data.images[name]
+    envTexNode.image = im

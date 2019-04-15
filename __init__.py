@@ -67,6 +67,16 @@ def register():
         description="Add camera to scene in addition to adding lights and world data",
         update=updateCamera,
         default=True)
+    bpy.types.Scene.hdri_resolution = EnumProperty(
+        name="HDRI Resolution",
+        description="Resolution of the HDRI Environment map (1k-16k)",
+        items=(("1k", "1k", "Use HDRI map at this resolution"),
+               ("2k", "2k", "Use HDRI map at this resolution"),
+               ("4k", "4k", "Use HDRI map at this resolution"),
+               ("8k", "8k", "Use HDRI map at this resolution"),
+               ("16k","16k","Use HDRI map at this resolution")),
+        update=loadHDRI,
+        default="8k")
     bpy.types.Scene.ds_scene_created = BoolProperty(default=False)
 
 def unregister():
